@@ -1,0 +1,178 @@
+const discord = require('discord.js');
+const auth = require('./auth.json');
+const logger = require('winston');
+const snek = require('snekfetch');
+
+const helpText = `
+Commercium links:
+Whitepaper:
+<http://commercium.net/Commercium_White_Paper.pdf>
+
+Block Explorers:
+<https://explorer.commercium.net/>
+<http://explorer.commercium.in:3001/>
+<http://explorer.chattymining.com/>
+
+Wallets:
+<https://wallet.commercium.net/> (Web wallet)
+<https://github.com/CommerciumBlockchain/Commercium/releases> (Client wallet)
+
+The cmmbot commands are:
+\`?pools\` (Pools list)
+\`?stats\` (Price, Nethash Etc)
+\`?cmm hashrate\` (estimate mining profit) example: \`?cmm 3000\`
+`;
+const poolList = [
+    {name: "VPOOL", url: "https://vpool.io", pool: "commercium"},
+    {name: "cmmpool.eu", url: "http://cmmpool.eu", pool: "commercium"},
+    {name: "DME", url: "http://pool.digitalminingexperts.com", pool: "commerciumpool"},
+    {name: "Dragon Pool", url: "https://cmm.dragonpool.xyz", pool: "commercium"},
+    {name: "COINBLOCKERS", url: "https://cmm.coinblockers.com", pool: "commercium"},
+    {name: "Miningspeed", url: "https://commercium.miningspeed.com", pool: "commercium"}
+];
+const statsUrl = "http://cmmpool.eu/api/stats";
+const waitText = "Please wait 1 minute, I am recharging.";
+
+let item = '';
+
+const talkedRecently = new Set();
+const bot = new discord.Client();
+bot.login(auth.token);
+bot.on('ready', evt => {
+    bot.user.setActivity('Type ?help');
+});
+
+bot.on('message', async message => {
+    if (message.content.substring(0, 1) === '?') {
+        let args = message.content.substring(1).split(' ');
+        let cmd = args[0];
+        let dm = true;
+        let validChannel = ['botchat', 'bot-command', 'bot-test', 'mining'];
+        if (validChannel.includes(message.channel.name)) {
+            dm = false;
+        }
+        args = args.splice(1);
+        switch (cmd) {
+            case 'help':
+
+                sendMessage(dm, message, helpText);
+
+                break;
+            case 'pools':
+                item = message.author.id + "_pools";
+                if (isCooldown(talkedRecently, item)) {
+
+                    sendMessage(dm, message, waitText, true);
+
+                    break;
+                }
+
+                setCooldown(talkedRecently, item);
+
+                let text1 = "Pool list may take several seconds to get stats!";
+                let poolText = "";
+
+                sendMessage(dm, message, text1);
+
+                for (let i = 0; i < poolList.length; i++) {
+                    poolText += poolList[i].name + " : <" + poolList[i].url + ">";
+
+                    try {
+                        let poolStats = await snek.get(poolList[i].url + "/api/stats");
+                        let statsJson = poolStats.body;
+                        let poolHashStr = statsJson.pools[poolList[i].pool].hashrateString
+
+                        poolText += " (" + poolHashStr + ") ";
+                        poolText += "\n";
+                    }
+                    catch (e) {
+                        poolText += " (Cannot retrieve data from pool API) \n";
+                        console.log(e)
+                    }
+                }
+
+                sendMessage(dm, message, poolText);
+
+                break;
+            case 'stats':
+                item = message.author.id + "_stats";
+                if (isCooldown(talkedRecently, item)) {
+
+                    sendMessage(dm, message, waitText, true);
+
+                    break;
+                }
+
+                setCooldown(talkedRecently, item);
+
+                let stats = await snek.get(statsUrl);
+                let statsJson = stats.body;
+                let networkStats = statsJson.pools.commercium.poolStats;
+
+                let statsText = "Difficulty: " + networkStats.networkDiff;
+                statsText += " \nNethash: " + networkStats.networkSolsString;
+                statsText += " \nBlock Height: " + networkStats.networkBlocks;
+                statsText += " \nExchange rate: (coming soon)";
+
+                sendMessage(dm, message, statsText);
+
+                break;
+
+            case 'cmm':
+                item = message.author.id + "_cmm";
+                if (isCooldown(talkedRecently, item)) {
+
+                    sendMessage(dm, message, waitText, true);
+
+                    break;
+                }
+
+                let hr = args[0];
+                if (isNaN(hr) || hr > 999999999 || hr <= 0) {
+                    break;
+                }
+
+                setCooldown(talkedRecently, item);
+
+                const r1 = await snek.get('http://explorer.chattymining.com/api/getnetworkhashps');
+                let nethash = r1.body;
+
+                const r2 = await snek.get('https://explorer.commercium.net/api/status?q=getDifficulty');
+                let diff = r2.body.difficulty;
+
+                //coinPerDay = hr / nethash * 2880 * 32;
+
+                let coinPerDay = (32 / diff) * ((hr * 86400) / Math.pow(2, 32));
+                coinPerDay = Number(coinPerDay).toFixed(8);
+
+                let miningMessage = "```Estimated with " + hr + " sol/s you would get: " + coinPerDay + " CMM per day with current nethash: " + Number(nethash / 1000 / 1000).toFixed(2) + " MSol/s (Diff: " + Number(diff).toFixed(8) + ")```";
+
+                sendMessage(dm, message, miningMessage);
+
+                break;
+        }
+    }
+});
+
+function sendMessage(isDM, source, message, isMention) {
+    if (isDM) {
+        source.author.send(message);
+    }
+    else {
+        if (isMention) {
+            message = message + " " + source.author;
+        }
+        source.channel.send(message);
+    }
+}
+
+function isCooldown(waitingPool, item) {
+    return waitingPool.has(item);
+}
+
+function setCooldown(waitingPool, item) {
+    waitingPool.add(item);
+    setTimeout(() => {
+        waitingPool.delete(item);
+    }, 60000);
+}

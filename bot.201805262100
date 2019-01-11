@@ -1,0 +1,40 @@
+const discord = require('discord.js');
+const auth = require('./auth.json');
+const logger = require('winston');
+const snek = require('snekfetch');
+
+const talkedRecently = new Set();
+const bot = new discord.Client();
+bot.login(auth.token);
+
+bot.on('message', async message => {
+	if (message.content.substring(0, 1) == '?') {
+		var args = message.content.substring(1).split(' ');
+		var cmd = args[0];
+		
+		args = args.splice(1);
+		switch (cmd) {
+			case 'cmm':
+				if (talkedRecently.has(message.author.id)) {
+					message.channel.send("Please wait 1 minute, I am recharging. - " + message.author);
+				}
+				else {
+					const r = await snek.get('http://explorer.chattymining.com/api/getnetworkhashps');
+					let nethash = r.body;
+					let hr = args[0];
+					if (isNaN(hr)) {
+						message.channel.send("Please use ```?cmm [your sol/s]```");
+						break;
+					}			
+					coinPerDay = hr / nethash * 2880 * 32;
+					coinPerDay = Number(coinPerDay).toFixed(8);
+					message.channel.send("```Estimated with " +hr+" sol/s you would get: " + coinPerDay + " CMM per day with current network hashrate: " + nethash + " sol/s```");
+					talkedRecently.add(message.author.id);
+					setTimeout(() => {
+						talkedRencently.delete(message.author.id);
+					}, 60000);
+				}
+				break;
+		}
+	}
+});

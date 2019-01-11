@@ -1,0 +1,33 @@
+{
+  "name": "cmm-bot",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Commercium Discord Bot",
+  "main": "bot.js",
+  "dependencies": {
+    "davefeedread": "^0.4.14",
+    "daveutils": "^0.4.24",
+    "discord.js": "^11.3.2",
+    "moment": "^2.22.2",
+    "pm2": "^3.2.2",
+    "sequelize": "^4.37.10",
+    "snekfetch": "^4.0.0",
+    "sqlite3": "^4.0.2",
+    "winston": "^2.4.2"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://htcang@bitbucket.org/htcang/cmm-bot.git"
+  },
+  "keywords": [
+    "Discordjs",
+    "bot"
+  ],
+  "author": "htcang",
+  "license": "ISC",
+  "homepage": "https://bitbucket.org/htcang/cmm-bot#readme"
+}

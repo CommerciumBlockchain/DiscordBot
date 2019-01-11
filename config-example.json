@@ -1,0 +1,9 @@
+{
+	"token": "NDQ5ODg2NjI3OTEzOTI0NjE5.DerNHA.itkOIwb1pGQ91bZcApIpvLjZhKI",
+	"prefix": "?",
+	"embedColor": "#27b7ed",
+	"iconURL": "https://cdn.discordapp.com/attachments/449877099340365834/451045428876804114/120x120_color.png",
+	"statsURL": "http://cmmpool.eu/api/stats",
+	"rateURL": "https://api.crex24.com/CryptoExchangeService/BotPublic/ReturnTicker?request=[NamePairs=BTC_CMM,USD_BTC]",
+	"validChannels": "botchat bot-command bot-test",
+}
