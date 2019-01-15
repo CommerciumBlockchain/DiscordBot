@@ -1,11 +1,5 @@
 [
-  {"name": "VPool", "url": "https://vpool.io", "pool": "commercium", "apiUrl": "https://vpool.io/api/stats", "fee": "0.4%"},
-  {"name": "CMM Pool", "url": "http://cmmpool.eu", "pool": "commercium", "apiUrl": "http://cmmpool.eu/api/stats", "fee": "1%"},
-  {"name": "DME", "url": "http://pool.digitalminingexperts.com", "pool": "commerciumpool", "apiUrl": "http://pool.digitalminingexperts.com/api/stats", "fee": "0.5%"},
-  {"name": "Dragon Pool", "url": "https://cmm.dragonpool.xyz", "pool": "commercium", "apiUrl": "https://cmm.dragonpool.xyz/api/stats", "fee": "0.4%"},
+  {"name": "VPool", "url": "https://vpool.io", "pool": "commercium", "apiUrl": "https://vpool.io/api/stats", "fee": "1%"},
   {"name": "Coin Blockers", "url": "https://cmm.coinblockers.com", "pool": "commercium", "apiUrl": "https://cmm.coinblockers.com/api/stats", "fee": "1%"},
-  {"name": "Mining Speed", "url": "https://commercium.miningspeed.com", "pool": "commercium", "apiUrl": "https://commercium.miningspeed.com/api/stats", "fee": "0.8%"},
-  {"name": "Coorp", "url": "https://coorp.io/pool/cmm", "pool": "cmm", "apiUrl": "https://coorp.io/public_api/stats", "fee": "0.4%"},
-  {"name": "Axe Pool", "url": "https://commercium.axepool.com/", "pool": "commercium", "apiUrl": "https://commercium.axepool.com/api/stats", "fee": "1%"},
-  {"name": "247mines", "url": "http://cmm.247mines.com/", "pool": "commercium", "apiUrl": "http://cmm.247mines.com/api/stats", "fee": "1%"}
+  {"name": "Coorp", "url": "https://coorp.io/pool/cmm", "pool": "cmm", "apiUrl": "https://coorp.io/public_api/stats", "fee": "1%"}
 ]
